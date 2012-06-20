@@ -99,12 +99,13 @@ class Riddle(db.Model):
 
 class Attempt(db.Model):
     __tablename__ = 'attempts'
+    id = db.Column(db.Integer, primary_key=True)
     answer_text = db.Column(db.UnicodeText)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     user = db.relationship(User, primaryjoin=(user_id==User.id))
     riddle_id = db.Column(db.Integer, db.ForeignKey('riddles.id'))
     riddle = db.relationship(Riddle, primaryjoin=(riddle_id==Riddle.id))
-    successful = db.Column(db.Boolean(default=False))
+    successful = db.Column(db.Boolean, default=False)
 
     @property
     def answer(self):
@@ -120,7 +121,7 @@ def user_view(user):
     return {
         'username': user.username,
         'token': user.token,
-    }
+        }
 
 def riddle_view(riddle):
     return {
@@ -128,7 +129,7 @@ def riddle_view(riddle):
         'question': riddle.question,
         'photo_url': riddle.photo_url,
         'author': riddle.author_name,
-    }
+        }
 
 def attempt_view(attempt):
     return {
@@ -183,7 +184,7 @@ def create_user():
     except IntegrityError:
         resp = jsonify({
             'username': "Username already taken",
-        })
+            })
         resp.status_code = 400
         return resp
 
