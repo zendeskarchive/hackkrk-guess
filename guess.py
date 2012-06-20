@@ -42,6 +42,9 @@ class RiddleForm(wtforms.Form):
     photo = wtforms.TextField(validators=[validators.required(),
                                           validators.length(max=1024 * 1024 * 5)])
 
+class AttemptForm(wtforms.Form):
+    answer = wtforms.TextField(validators=[validators.required()])
+
 class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -88,9 +91,29 @@ class Riddle(db.Model):
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     author = db.relationship(User, primaryjoin=(author_id==User.id))
 
+    attempts = db.relationship("Attempt", backref="riddle")
+
     @property
     def author_name(self):
         return self.author.username
+
+class Attempt(db.Model):
+    __tablename__ = 'attempts'
+    answer_text = db.Column(db.UnicodeText)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    user = db.relationship(User, primaryjoin=(user_id==User.id))
+    riddle_id = db.Column(db.Integer, db.ForeignKey('riddles.id'))
+    riddle = db.relationship(Riddle, primaryjoin=(riddle_id==Riddle.id))
+    successful = db.Column(db.Boolean(default=False))
+
+    @property
+    def answer(self):
+        return self.answer_text
+
+    @answer.setter
+    def answer(self, value):
+        self.successful = (value == self.riddle.answer)
+        self.answer_text = value
 
 
 def user_view(user):
@@ -105,6 +128,12 @@ def riddle_view(riddle):
         'question': riddle.question,
         'photo_url': riddle.photo_url,
         'author': riddle.author_name,
+    }
+
+def attempt_view(attempt):
+    return {
+        'answer': attempt.answer,
+        'successful': attempt.successful
     }
 
 def errors(errors, code=400):
@@ -161,13 +190,7 @@ def create_user():
 
 @app.route("/riddles", methods=["GET"])
 def riddles():
-    user = authenticate()
-    form = RiddleForm(params())
-    if form.validate():
-        riddle = Riddle(user)
-
-    else:
-        return errors(form.errors)
+    pass
 
 @app.route("/riddles", methods=["POST"])
 def post_riddle():
@@ -190,8 +213,17 @@ def post_riddle():
 
 @app.route("/riddles/<id>/answer", methods=["POST"])
 def answer_riddle(id):
-    return jsonify({
-    })
+    user = authenticate()
+    riddle = Riddle.query.get(id)
+    form = AttemptForm(params())
+    if form.validate():
+        attempt = Attempt(user, riddle)
+        form.populate_obj(attempt)
+        db.session.add(attempt)
+        db.session.commit()
+        return jsonify(attempt_view(attempt))
+    else:
+        return errors(form.errors)
 
 @app.route("/leaderboard")
 def leaderboard():
