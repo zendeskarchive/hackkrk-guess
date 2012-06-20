@@ -38,12 +38,15 @@ class User(db.Model):
     def password(self, value):
         self.password_hash = hashlib.md5(value).hexdigest()
 
-    def is_password(self, value):
+    def check_password(self, value):
         return self.password_hash == hashlib.md5(value).hexdigest()
 
     def generate_token(self):
         self.token = hashlib.md5(os.urandom(64)).hexdigest()
         return self.token
+
+
+
 
 
 class Riddle(db.Model):
@@ -56,30 +59,44 @@ class Riddle(db.Model):
     author = db.relationship(User, primaryjoin=(author_id==User.id))
 
 
+def authentication_data(user):
+    return {
+        'username': user.username,
+        'token': user.token,
+    }
+
+
+def errors(errors):
+    resp = jsonify(errors)
+    resp.status_code = 400
+    return resp
 
 @app.route('/user', methods=['GET'])
 def validate_user():
-    return jsonify({
-    })
+    form = UserForm(params())
+    if form.validate():
+        user = User.query.filter_by(username=form.username.data).first()
+        if user and user.check_password(form.password.data):
+            return jsonify(authentication_data(user))
+        else:
+
+            return errors({ "error": "Account doesn't exist." })
+    else:
+        return errors(form.errors)
 
 @app.route('/user', methods=['POST'])
 def create_user():
     try:
-        form = UserForm(MultiDict(request.json))
+        form = UserForm(params())
         if form.validate():
             user = User()
             user.generate_token()
             form.populate_obj(user)
             db.session.add(user)
             db.session.commit()
-            return jsonify({
-                'username': user.username,
-                'token': user.token,
-            })
+            return jsonify(authentication_data(user))
         else:
-            resp = jsonify(form.errors)
-            resp.status_code = 400
-            return resp
+            return errors(form.errors)
     except IntegrityError:
         resp = jsonify({
             'username': "Username already taken",
@@ -107,6 +124,9 @@ def answer_riddle(id):
 def leaderboard():
     return jsonify({
     })
+
+def params():
+    return MultiDict(request.json)
 
 if __name__ == '__main__':
 
