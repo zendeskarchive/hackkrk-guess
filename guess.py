@@ -19,7 +19,7 @@ def a_riddle(id):
 @app.route('/user', methods=['GET', 'POST'])
 def user():
     return jsonify({
-        'login': 'hackkrk',
+        'username': 'hackkrk',
         'token': 'dead00coffee'
     })
 
