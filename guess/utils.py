@@ -22,3 +22,26 @@ def upload_photo(username, photo):
 
 def random_hex(bytes=64):
     return hashlib.md5(os.urandom(bytes)).hexdigest()
+
+class Pager(object):
+    def __init__(self, total, page, per_page):
+        self.total = total
+        self.page = page
+        self.per_page = per_page
+
+    @property
+    def start(self):
+        return ((self.page - 1) * self.per_page)
+
+    @property
+    def stop(self):
+        return self.page * self.per_page
+
+    @property
+    def slice(self):
+        return self.start, self.stop
+
+    @property
+    def page_count(self):
+        import math
+        return int(math.ceil(float(self.total) / self.per_page))

@@ -14,3 +14,9 @@ class RiddleForm(wtforms.Form):
 
 class AttemptForm(wtforms.Form):
     answer = wtforms.TextField(validators=[validators.required()])
+
+class PageForm(wtforms.Form):
+    page = wtforms.IntegerField(default=1, validators=[
+        validators.number_range(min=1)])
+    per_page = wtforms.IntegerField(default=10, validators=[
+        validators.number_range(min=1)])

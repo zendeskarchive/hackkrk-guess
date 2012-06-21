@@ -22,11 +22,11 @@ def attempt_view(attempt):
         'successful': attempt.successful
     }
 
-def riddles_listing_view(riddles):
+def riddles_listing_view(pager, riddles):
     ret = {
-        'total': len(riddles),
-        'page': 1,
-        'page_count': 1,
+        'total': pager.total,
+        'page': pager.page,
+        'page_count': pager.page_count,
         'riddles': [riddle_view(r) for r in riddles]
     }
     return ret
