@@ -7,6 +7,8 @@ Fake API instance is running at http://hackkrk-guess-static.herokuapp.com.
 
 Live API instance is running at http://hackkrk-guess.herokuapp.com.
 
+Always send requests with `Content-Type` header set to `application/json`.
+
 Authentication
 --------------
 
