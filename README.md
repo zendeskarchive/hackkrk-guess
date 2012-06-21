@@ -4,6 +4,7 @@ HackKRK #6 Guess App
 Direct your questions to Tomek ([@oinopion](http://twitter.com/oinopion)) or Tomek ([@neaf](http://twitter.com/neaf)).
 
 Fake API instance is running at http://hackkrk-guess-static.herokuapp.com.
+
 Live API instance is running at http://hackkrk-guess.herokuapp.com.
 
 Authentication
