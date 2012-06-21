@@ -1,1 +1,1 @@
-web: gunicorn guess:app -b 0.0.0.0:$PORT -w 4
+web: gunicorn guess:app -b 0.0.0.0:$PORT -w 3
