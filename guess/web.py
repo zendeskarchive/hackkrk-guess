@@ -10,7 +10,8 @@ from guess.utils import upload_photo
 from guess.views import attempt_view, riddle_view, user_view
 
 
-class Unauthorized(HTTPException): pass
+class Unauthorized(HTTPException):
+    code = 401
 
 
 @app.route('/user', methods=['GET'])
@@ -49,7 +50,9 @@ def create_user():
 
 @app.route("/riddles", methods=["GET"])
 def riddles():
-    pass
+    user = authenticate()
+    riddles = Riddle.query.all()
+
 
 @app.route("/riddles", methods=["POST"])
 def post_riddle():
@@ -93,8 +96,8 @@ def params():
     return MultiDict(request.json)
 
 
-@app.errorhandler(Unauthorized)
-def unauthorized():
+@app.errorhandler(401)
+def unauthorized(e):
     return errors({'authentication': 'Please provide valid auth token'}, 401)
 
 
@@ -105,7 +108,7 @@ def authenticate():
     if user:
         return user
     else:
-        raise HTTPException()
+        raise Unauthorized()
 
 def errors(errors, code=400):
     resp = jsonify(errors)

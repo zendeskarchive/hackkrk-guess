@@ -17,3 +17,10 @@ def attempt_view(attempt):
         'answer': attempt.answer,
         'successful': attempt.successful
     }
+
+def riddles_listing_view(riddles):
+    ret = []
+    for riddle in riddles:
+        riddle.answered = any(att.successful for att in riddle.attempts)
+        ret.append(riddle)
+    return ret

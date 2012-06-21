@@ -30,6 +30,7 @@ class User(db.Model):
     def from_token(cls, token):
         return cls.query.filter_by(token=token).first()
 
+
 class Riddle(db.Model):
     __tablename__ = 'riddles'
     id = db.Column(db.Integer, primary_key=True)
@@ -39,11 +40,16 @@ class Riddle(db.Model):
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     author = db.relationship(User, primaryjoin=(author_id==User.id))
 
-    attempts = db.relationship("Attempt", backref="riddle")
+    attempts = db.relationship('Attempt', backref='riddle')
 
     @property
     def author_name(self):
         return self.author.username
+
+    @classmethod
+    def for_listing(cls, user):
+        q = cls.query.options(db.joinedload(Riddle.attempts))
+        return q.filter(Attempt.user_id==user.id)
 
 class Attempt(db.Model):
     __tablename__ = 'attempts'
@@ -52,8 +58,11 @@ class Attempt(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     user = db.relationship(User, primaryjoin=(user_id==User.id))
     riddle_id = db.Column(db.Integer, db.ForeignKey('riddles.id'))
-    riddle = db.relationship(Riddle, primaryjoin=(riddle_id==Riddle.id))
     successful = db.Column(db.Boolean, default=False)
+
+    def __init__(self, user, riddle):
+        self.user = user
+        self.riddle = riddle
 
     @property
     def answer(self):
