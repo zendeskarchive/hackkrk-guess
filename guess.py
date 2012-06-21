@@ -11,6 +11,7 @@ riddle = {
     'points': 2,
     'solved': False,
     'created_at': '2012-06-21T18:20:12Z',
+    'author': 'test_user',
 }
 
 def a_riddle(id):
