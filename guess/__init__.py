@@ -8,8 +8,5 @@ AUTH_TOKEN = 'X-Auth-Token'
 
 app = Flask(__name__)
 db = SQLAlchemy(app)
-heroku = Heroku(app)
 
-if not 'DATABASE_URL' in environ:
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
-
+app.config['SQLALCHEMY_DATABASE_URI'] = environ.get('DATABASE_URL', 'sqlite:///test.db')
