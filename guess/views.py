@@ -23,10 +23,24 @@ def attempt_view(attempt):
     }
 
 def riddles_listing_view(pager, riddles):
-    ret = {
+    return {
         'total': pager.total,
         'page': pager.page,
         'page_count': pager.page_count,
         'riddles': [riddle_view(r) for r in riddles]
     }
-    return ret
+
+def user_leader_board_view(user):
+    return {
+        'username': user.username,
+        'score': getattr(user, 'score', 0),
+    }
+
+def leaderboard_view(pager, users):
+    return {
+        'total': pager.total,
+        'page': pager.page,
+        'page_count': pager.page_count,
+        'users': [user_leader_board_view(r) for r in users]
+    }
+

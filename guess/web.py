@@ -8,7 +8,8 @@ from guess import app, db, AUTH_TOKEN
 from guess.forms import UserForm, AttemptForm, RiddleForm, PageForm
 from guess.models import User, Attempt, Riddle
 from guess.utils import upload_photo, Pager
-from guess.views import attempt_view, riddle_view, user_view, riddles_listing_view
+from guess.views import attempt_view, riddle_view, user_view, \
+    riddles_listing_view, leaderboard_view
 
 
 class Unauthorized(HTTPException):
@@ -106,8 +107,19 @@ def answer_riddle(id):
 
 @app.route("/leaderboard")
 def leaderboard():
-    return jsonify({
-    })
+    user = authenticate()
+    form = PageForm(params())
+    if not form.validate():
+        return errors(form.errors)
+    total = User.query.count()
+    pager = Pager(total=total, **form.data)
+    users = User.query.order_by(User.username).slice(*pager.slice)
+    user_map = {}
+    for user in users:
+        user_map[user.id] = user
+    for user_id, count in db.session.query(Attempt.user_id, db.func.count(Attempt.user_id)).group_by(Attempt.user_id).filter_by(successful=True).all():
+        user_map[user_id].score = count
+    return jsonify(leaderboard_view(pager, users))
 
 def params():
     if request.method == 'GET':
