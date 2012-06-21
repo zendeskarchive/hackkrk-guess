@@ -1,3 +1,4 @@
+from datetime import datetime
 import os
 import hashlib
 from guess import db
@@ -39,8 +40,12 @@ class Riddle(db.Model):
     photo_url = db.Column(db.UnicodeText)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     author = db.relationship(User, primaryjoin=(author_id==User.id))
+    created_at = db.Column(db.DateTime)
 
     attempts = db.relationship('Attempt', backref='riddle')
+
+    def __init__(self):
+        self.created_at = datetime.utcnow()
 
     @property
     def author_name(self):

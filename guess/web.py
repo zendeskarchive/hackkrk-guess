@@ -1,4 +1,5 @@
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.sql.expression import func
 from werkzeug.datastructures import MultiDict
 from werkzeug.exceptions import HTTPException
 from flask import request, jsonify
@@ -7,7 +8,7 @@ from guess import app, db, AUTH_TOKEN
 from guess.forms import UserForm, AttemptForm, RiddleForm
 from guess.models import User, Attempt, Riddle
 from guess.utils import upload_photo
-from guess.views import attempt_view, riddle_view, user_view
+from guess.views import attempt_view, riddle_view, user_view, riddles_listing_view
 
 
 class Unauthorized(HTTPException):
@@ -51,7 +52,17 @@ def create_user():
 @app.route("/riddles", methods=["GET"])
 def riddles():
     user = authenticate()
-    riddles = Riddle.query.all()
+    riddles_map = {}
+    for riddle in Riddle.query.all():
+        riddles_map[riddle.id] = riddle
+    for (id, ) in db.session.query(Attempt.riddle_id).filter_by(successful=True).filter_by(user_id=user.id).all():
+        riddles_map[id].solved = True
+    for id, attempted_by in db.session.query(Attempt.riddle_id, func.count(Attempt.riddle_id)).group_by(Attempt.riddle_id).all():
+        riddles_map[id].attempted_by = attempted_by
+    for id, solved_by in db.session.query(Attempt.riddle_id, func.count(Attempt.riddle_id)).group_by(Attempt.riddle_id).filter_by(successful=True).all():
+        riddles_map[id].solved_by = solved_by
+    return jsonify(riddles_listing_view(riddles_map.values()))
+
 
 
 @app.route("/riddles", methods=["POST"])

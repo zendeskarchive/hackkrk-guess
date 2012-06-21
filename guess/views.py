@@ -10,6 +10,10 @@ def riddle_view(riddle):
         'question': riddle.question,
         'photo_url': riddle.photo_url,
         'author': riddle.author_name,
+        'solved': getattr(riddle, 'solved', False),
+        'solved_by': getattr(riddle, 'solved_by', 0),
+        'attempted_by': getattr(riddle, 'attempted_by', 0),
+        'created_at': riddle.created_at.isoformat() + 'Z',
         }
 
 def attempt_view(attempt):
@@ -19,8 +23,10 @@ def attempt_view(attempt):
     }
 
 def riddles_listing_view(riddles):
-    ret = []
-    for riddle in riddles:
-        riddle.answered = any(att.successful for att in riddle.attempts)
-        ret.append(riddle)
+    ret = {
+        'total': len(riddles),
+        'page': 1,
+        'page_count': 1,
+        'riddles': [riddle_view(r) for r in riddles]
+    }
     return ret
