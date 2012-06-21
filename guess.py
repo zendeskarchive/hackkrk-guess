@@ -27,7 +27,7 @@ def user():
 def riddles():
     return jsonify({
         'riddles': [a_riddle(n+1) for n in range(5)],
-        'count': 5,
+        'total': 5,
         'page': 1,
         'page_count': 1,
     })
