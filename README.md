@@ -85,13 +85,9 @@ Creates new riddle.
 
 Returns paginated list of all riddles.
 
-```javascript
-// Request
-{
-  "page": 2,
-  "per_page": 10
-}
+Takes `page` and `per_page` GET params.
 
+```javascript
 // Response
 {
   "total": 47
@@ -124,13 +120,9 @@ Registers an attempt in solvig specific riddle.
 
 Returns paginated ranking of users.
 
-```javascript
-// Request
-{
-  "page": 2,
-  "per_page": 10
-}
+Takes `page` and `per_page` GET params.
 
+```javascript
 // Response
 {
   "total": 47
