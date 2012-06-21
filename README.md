@@ -43,13 +43,9 @@ Creates new user and returns auth token.
 
 Authenticates user and returns auth token.
 
-```javascript
-// Request
-{
-  "username": "sample_username",
-  "password": "sample_password"
-}
+Takes `username` and `password` GET params.
 
+```javascript
 // Response
 {
   "username": "sample_username",
