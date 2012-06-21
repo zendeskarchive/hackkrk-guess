@@ -19,7 +19,7 @@ def riddle_view(riddle):
 def attempt_view(attempt):
     return {
         'answer': attempt.answer,
-        'successful': attempt.successful
+        'correct': attempt.successful
     }
 
 def riddles_listing_view(pager, riddles):
