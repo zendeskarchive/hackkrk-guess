@@ -118,7 +118,8 @@ def leaderboard():
     for user in users:
         user_map[user.id] = user
     for user_id, count in db.session.query(Attempt.user_id, db.func.count(Attempt.user_id)).group_by(Attempt.user_id).filter_by(successful=True).all():
-        user_map[user_id].score = count
+        if user_id in user_map:
+            user_map[user_id].score = count
     return jsonify(leaderboard_view(pager, users))
 
 def params():
