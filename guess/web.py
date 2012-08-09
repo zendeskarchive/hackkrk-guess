@@ -59,7 +59,7 @@ def riddles():
         return errors(form.errors)
     pager = Pager(total=total, **form.data)
     riddles_map = {}
-    riddles = Riddle.query.order_by(Riddle.created_at).slice(*pager.slice).all()
+    riddles = Riddle.query.order_by(Riddle.created_at).all()
     for riddle in riddles:
         riddles_map[riddle.id] = riddle
     for (id, ) in db.session.query(Attempt.riddle_id).filter_by(successful=True).filter_by(user_id=user.id).all():
